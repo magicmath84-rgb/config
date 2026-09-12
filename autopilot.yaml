@@ -1,0 +1,54 @@
+# Autopilot "Trader Brain" config (blueprint v6.1, Section 31).
+# Loaded by services/autopilot (port 8086). strategy_epoch is computed at
+# startup as SHA256 over the strategy-relevant fields (see services/autopilot).
+mode: OFF                    # OFF|OBSERVE|PAPER_AUTOPILOT|SUPERVISED_AUTO|FULL_AUTO
+strategy_version: "v6.1"     # human label (strategy_epoch is the hash)
+
+decision_cycle_sec: 60
+order_track_sec: 3
+position_monitor_sec: 3
+emergency_monitor_sec: 1
+
+score_entry: 0.55            # 0.60 in BALANCED (Section 16)
+score_exit: 0.45
+sl_atr_multiplier: 1.5
+tp_atr_multiplier: 3.0
+max_hold_sessions: 20        # INTENTIONAL change 10→20 (longer swing hold; §37)
+
+max_concurrent: 5
+max_pending: 5
+max_daily_entries: 3
+entry_exclude_last_min: 10
+exit_exclude_last_min: 5
+survival_qty_factor: 0.5
+unresolved_max_cycles: 3
+
+drawdown_pause_pct: 10.0
+auto_resume: false
+
+breaker_fail_threshold: 3
+breaker_window_min: 5
+breaker_pause_sec: 60
+
+kill_switch_square_off: false
+
+freshness:                    # mirror of existing freshness_sla
+  signal_max_age_sec: 120
+  risk_max_age_sec: 30
+  portfolio_max_age_sec: 10
+  market_data_max_age_sec: 60
+
+emergency_data:               # Section 14
+  emergency_price_max_age_sec: 300
+  emergency_price_source: last_tick
+
+regime_gate:
+  enabled: false
+  rules:
+    - region: IN
+      index_symbol: NIFTY
+      sma_period: 20
+
+holidays:
+  IN: ["2026-08-15", "2026-10-02"]
+  US: []

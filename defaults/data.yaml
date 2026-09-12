@@ -1,0 +1,128 @@
+# Data configuration (defaults)
+
+market:
+  universe: multi_region
+  # Paper mode uses a built-in deterministic market simulator.
+  # For live mode, plug a real DataProvider (see services/ingestion).
+  # provider=api trades the multi-region universe below with real Yahoo
+  # Finance data (simulator remains the fallback for paper/demo).
+  provider: simulator          # simulator | api
+  symbols_override: []         # empty = use default Nifty 50 liquid list
+  # Survival mode (mode 1) keeps one critical symbol per region so the
+  # multi-region universe stays active even under resource constraints.
+  critical_symbols: [RELIANCE, AAPL, 7203, VOD, SAP, 0700]   # IN, US, JP, UK, DE, HK
+  regions:
+    - code: IN
+      name: "India (NSE)"
+      exchange: "NSE"
+      tz: "Asia/Kolkata"
+      market_open: "09:15"
+      market_close: "15:30"
+      yahoo_suffix: ".NS"
+      symbols:
+        - { ticker: "RELIANCE", sector: "energy" }
+        - { ticker: "TCS", sector: "information_technology" }
+        - { ticker: "HDFCBANK", sector: "financial_services" }
+        - { ticker: "INFY", sector: "information_technology" }
+        - { ticker: "ICICIBANK", sector: "financial_services" }
+        - { ticker: "SBIN", sector: "financial_services" }
+        - { ticker: "BHARTIARTL", sector: "telecom" }
+        - { ticker: "ITC", sector: "fmcg" }
+    - code: US
+      name: "United States (NYSE/NASDAQ)"
+      exchange: "NYSE/NASDAQ"
+      tz: "America/New_York"
+      market_open: "09:30"
+      market_close: "16:00"
+      yahoo_suffix: ""
+      symbols:
+        - { ticker: "AAPL", sector: "technology" }
+        - { ticker: "MSFT", sector: "technology" }
+        - { ticker: "NVDA", sector: "semiconductors" }
+        - { ticker: "TSLA", sector: "auto" }
+        - { ticker: "GOOGL", sector: "technology" }
+        - { ticker: "AMZN", sector: "consumer" }
+        - { ticker: "META", sector: "technology" }
+        - { ticker: "JPM", sector: "financial_services" }
+    - code: JP
+      name: "Japan (TSE)"
+      exchange: "TSE"
+      tz: "Asia/Tokyo"
+      market_open: "09:00"
+      market_close: "15:00"
+      yahoo_suffix: ".T"
+      symbols:
+        - { ticker: "7203", sector: "auto" }
+        - { ticker: "6758", sector: "technology" }
+        - { ticker: "9984", sector: "telecom" }
+        - { ticker: "8035", sector: "semiconductors" }
+        - { ticker: "6861", sector: "technology" }
+    - code: UK
+      name: "United Kingdom (LSE)"
+      exchange: "LSE"
+      tz: "Europe/London"
+      market_open: "08:00"
+      market_close: "16:30"
+      yahoo_suffix: ".L"
+      symbols:
+        - { ticker: "VOD", sector: "telecom" }
+        - { ticker: "HSBA", sector: "financial_services" }
+        - { ticker: "BP", sector: "energy" }
+        - { ticker: "LLOY", sector: "financial_services" }
+        - { ticker: "SHEL", sector: "energy" }
+    - code: DE
+      name: "Germany (XETRA)"
+      exchange: "XETRA"
+      tz: "Europe/Berlin"
+      market_open: "09:00"
+      market_close: "17:30"
+      yahoo_suffix: ".DE"
+      symbols:
+        - { ticker: "SAP", sector: "technology" }
+        - { ticker: "SIE", sector: "technology" }
+        - { ticker: "BMW", sector: "auto" }
+        - { ticker: "ALV", sector: "financial_services" }
+        - { ticker: "BAS", sector: "pharma" }
+    - code: HK
+      name: "Hong Kong (HKEX)"
+      exchange: "HKEX"
+      tz: "Asia/Hong_Kong"
+      market_open: "09:30"
+      market_close: "16:00"
+      yahoo_suffix: ".HK"
+      symbols:
+        - { ticker: "0700", sector: "technology" }
+        - { ticker: "9988", sector: "consumer" }
+        - { ticker: "0005", sector: "financial_services" }
+        - { ticker: "1299", sector: "financial_services" }
+        - { ticker: "3690", sector: "consumer" }
+
+ingestion:
+  tick_interval_sec: 30        # market open baseline
+  market_open: "09:15"
+  market_close: "15:30"
+  tz: "Asia/Kolkata"
+  validation:
+    reject_non_positive_price: true
+    reject_non_positive_volume: true
+    reject_stale_tick_sec: 60
+    reject_negative_change: false
+  retry:
+    max_attempts: 3
+    backoff_base_sec: 1
+
+freshness_sla:                 # blueprint v5.7 section 3
+  ingestion_last_tick_sec: 60
+  analysis_last_signal_sec: 120
+  risk_event_eval_sec: 30
+  risk_periodic_eval_sec: 120
+  order_state_sec: 15
+  db_query_sec: 2
+
+simulator:
+  seed: 20260802
+  base_price_min: 250.0
+  base_price_max: 3200.0
+  volatility_daily: 0.015
+  drift: 0.0002
+  tick_bars: true

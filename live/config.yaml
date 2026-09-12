@@ -1,0 +1,33 @@
+# Live mode configuration (FUTURE — NOT ACTIVE in V1)
+# V1 is paper-only. Live trading starts only after paper mode proves
+# consistent edge + robust risk control (success criteria, blueprint section 9).
+mode: live
+config_version: "5.7.0"
+
+risk:
+  initial_capital: 1000000.0
+  hard_rules: defaults
+  kelly_fraction: 0.25
+  risk_of_ruin_max: 0.005
+  max_position_pct: 8.0
+  max_sector_pct: 22.0
+  daily_loss_level1_pct: 2.5
+  cumulative_loss_level2_pct: 9.0
+  heat_max_pct: 6.0
+
+performance:
+  initial_mode: 3
+  enable_triggers: true
+  hysteresis_stable_window_min: 10
+
+data:
+  provider: api                   # requires a real DataProvider + keys
+  symbols_override: []
+  tick_interval_sec: 30
+
+audit:
+  enabled: true
+  level: full
+
+# NOTE: live broker integration is Phase 9 (Future) — not implemented.
+# Do NOT enable live mode until broker adapter exists and passes review.

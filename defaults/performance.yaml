@@ -1,0 +1,94 @@
+# Performance modes + trigger thresholds (defaults)
+# See blueprint v5.7 section 4.
+
+performance_modes:
+  3:                    # Full Power
+    name: full_power
+    target: server_pc
+    concurrency: 8
+    ingestion_poll_sec: 30
+    analysis_interval_sec: 60
+    dashboard_refresh_sec: 5
+    sentiment_enabled: true
+    heavy_indicators_enabled: true
+    new_trade_generation: true
+    background_jobs: true
+  2:                    # Balanced
+    name: balanced
+    target: low_resource
+    concurrency: 4
+    ingestion_poll_sec: 60
+    analysis_interval_sec: 120
+    dashboard_refresh_sec: 10
+    sentiment_enabled: true
+    heavy_indicators_enabled: true
+    new_trade_generation: true
+    background_jobs: false
+  1:                    # Survival
+    name: survival
+    target: phone_emergency
+    concurrency: 2
+    ingestion_poll_sec: 120
+    analysis_interval_sec: 300
+    dashboard_refresh_sec: 30
+    sentiment_enabled: false
+    heavy_indicators_enabled: false
+    new_trade_generation: false
+    background_jobs: false
+
+# Survival mode strict feature budget (locked):
+#   ALWAYS ON (P0/P1): risk_engine, kill_switch, open_position_tracking,
+#                      basic_audit, diagnostic_scan_quick
+#   Reduced: ingestion -> 1-3 critical symbols only, slow polling
+#   OFF:     sentiment, non-critical/heavy indicators, new trade generation,
+#            non-essential background jobs
+
+# Survival mode symbol limit (reduced ingestion scope).
+# One critical symbol per region (6 regions) keeps multi-region presence alive.
+survival_critical_symbols: 6
+survival_ingestion_poll_sec: 120
+
+# Trigger matrix thresholds + hysteresis (locked v5.7)
+# Down-switch: relatively fast. Up-switch: only after stable healthy window.
+triggers:
+  cpu:
+    down_to_mode2_pct: 85
+    down_to_mode2_for_min: 3
+    down_to_mode1_pct: 95
+    down_to_mode1_for_min: 2
+  memory:
+    down_to_mode2_pct: 80
+    down_to_mode1_pct: 90
+  battery:
+    down_to_mode2_pct: 40
+    down_to_mode1_pct: 20
+    up_above_pct: 50
+  thermal:
+    down_to_mode2: throttling_detected
+    down_to_mode1: severe_throttling
+  service_health:
+    down_to_mode2: 1_non_critical_failure
+    down_to_mode1: critical_unstable
+
+hysteresis:
+  up_switch_stable_window_min: 10   # mandatory stable healthy window before up-switch
+  sampling_sec: 30
+
+# Safety priority table (locked)
+safety_priorities:
+  P0:
+    functions: [risk_engine, kill_switch, position_protection]
+    throttle_allowed: frequency_only
+    minimum_guarantee: never_fully_disabled
+  P1:
+    functions: [open_position_tracking, order_state]
+    throttle_allowed: limited
+    minimum_guarantee: must_track_open_positions
+  P2:
+    functions: [analysis, ingestion_volume]
+    throttle_allowed: true
+    minimum_guarantee: can_be_heavily_reduced
+  P3:
+    functions: [sentiment, extra_indicators, heavy_ui_refresh]
+    throttle_allowed: true
+    minimum_guarantee: can_be_disabled

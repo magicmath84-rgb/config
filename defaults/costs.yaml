@@ -1,0 +1,17 @@
+# Transaction-cost + slippage model (defaults) — see core/src/costs.rs.
+#
+# Percentages are fractions of turnover (0.00025 = 0.025%). Defaults model a
+# discount broker (Zerodha-style) for NSE equity intraday. Set `enabled: false`
+# to reproduce raw, cost-free paper fills (used by some unit tests).
+costs:
+  enabled: true
+  slippage_bps: 5.0            # adverse fill, both sides (0.05%)
+  brokerage_pct: 0.0003        # 0.03% of turnover
+  brokerage_cap: 20.0          # capped at Rs 20 per order
+  brokerage_flat: 0.0          # no minimum
+  stt_sell_pct: 0.00025        # 0.025% STT, sell side only
+  exchange_txn_pct: 0.0000297  # NSE transaction charge, both sides
+  sebi_pct: 0.000001           # SEBI turnover fee, both sides
+  gst_pct: 0.18                # 18% GST on brokerage + exchange + SEBI
+  stamp_duty_buy_pct: 0.00003  # 0.003% stamp duty, buy side only
+  dp_charge_sell: 0.0          # flat DP charge on sell (intraday: 0)

@@ -1,0 +1,39 @@
+# Paper mode configuration (locked v5.7)
+mode: paper
+config_version: "5.7.0"
+
+# Startup validator requirements:
+#  - mode must be 'paper' or 'live'
+#  - config_version required
+#  - config_hash computed at load; must match hash recorded at runtime
+#  - interdependent constraints validated (see gateway validator)
+
+risk:
+  initial_capital: 1000000.0
+  hard_rules: defaults            # inherit config/defaults/risk.yaml
+  kelly_fraction: 0.25
+  risk_of_ruin_max: 0.005
+  max_position_pct: 8.0
+  max_sector_pct: 22.0
+  daily_loss_level1_pct: 2.5
+  cumulative_loss_level2_pct: 9.0
+  heat_max_pct: 6.0
+  # Money Control Panel — master toggle OFF by default (project behaves as-is).
+  money_control:
+    enabled: false
+    max_stock_value: 80000.0
+    loss_budget: 200000.0
+
+performance:
+  initial_mode: 3                 # full power
+  enable_triggers: true
+  hysteresis_stable_window_min: 10
+
+data:
+  provider: simulator
+  symbols_override: []
+  tick_interval_sec: 30
+
+audit:
+  enabled: true
+  level: full                     # full | basic (survival keeps basic)

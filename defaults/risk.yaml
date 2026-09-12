@@ -1,0 +1,66 @@
+# Risk engine hard rules (defaults) — blueprint v5.7 section 6
+# All values are percentages unless noted.
+
+hard_rules:
+  max_position_pct: 8.0        # hard block
+  max_sector_pct: 22.0         # hard block
+  daily_loss_level1_pct: 2.5   # level 1 trigger
+  cumulative_loss_level2_pct: 9.0   # level 2 trigger
+  heat_max_pct: 6.0            # > max -> no new trades
+  risk_of_ruin_max: 0.005      # 0.5% -> size reduce / reject
+  risk_engine_down: level3     # fully manual recovery
+
+levels:
+  level1:
+    action: reduce_new_exposure
+    description: daily loss threshold hit, new exposure limited
+  level2:
+    action: halt_new_trades
+    description: cumulative loss threshold hit, new trades halted
+  level3:
+    action: manual_only
+    description: risk engine unavailable, fully manual recovery
+
+# Kelly fraction (0 < kelly_fraction <= 1)
+kelly_fraction: 0.25
+
+# Monte Carlo risk-of-ruin pre-screen parameters
+risk_of_ruin:
+  mc_simulations: 10000        # canonical approx, pre-screen only
+  mc_sequence_length: 252
+  bankroll_fraction_at_ruin: 0.5   # ruin if equity < 50% of peak
+
+# Expected Shortfall (500-day rolling)
+expected_shortfall:
+  window_days: 500
+  confidence: 0.95
+
+# Position / sector limits source (Nifty 50 liquid stocks)
+sector_weights:
+  financial_services: 0.22
+  information_technology: 0.22
+  energy: 0.22
+  consumer: 0.22
+  auto: 0.22
+  pharma: 0.22
+  metals: 0.22
+  fmcg: 0.22
+  telecom: 0.22
+  infrastructure: 0.22
+
+# Normalized signal score constraints
+signal_score:
+  min: 0.0
+  max: 1.0
+  sentiment_hard_cap: 0.2      # sentiment component capped at 20%
+
+# Money Control Panel (opt-in). Master `enabled` toggle:
+#   false = project trades exactly as before (no money caps).
+#   true  = both lines enforced by the risk engine.
+#   Line 1 max_stock_value: max money (₹) invested in a single stock.
+#   Line 2 loss_budget: max total loss (₹) from initial capital before new
+#          buys halt; a manual reset re-enables trading.
+money_control:
+  enabled: false
+  max_stock_value: 80000.0
+  loss_budget: 200000.0
